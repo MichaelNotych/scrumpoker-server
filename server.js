@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require('cors');
+const cors = require("cors");
 const { status } = require("http-status");
 
 const ApiError = require("./utils/ApiError");
@@ -10,14 +10,16 @@ const config = require("./config/config");
 
 const app = express();
 
-app.use(cors({
-	origin: config.clientUrl,
-	methods: ['GET', 'POST'],
-	allowedHeaders: ['Content-Type', 'Authorization']
-}))
 app.use(express.json());
-app.use(roomRouter);
-app.use(userRouter);
+app.use(
+	cors({
+		origin: config.clientUrl,
+		methods: ["GET", "POST"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	})
+);
+app.use("/api/v1", roomRouter);
+app.use("/api/v1", userRouter);
 app.use((req, res, next) => {
 	next(new ApiError(status.NOT_FOUND, "Not found"));
 });
