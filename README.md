@@ -52,5 +52,9 @@ This is the backend service for the Scrum Poker application, built using Node.js
 - POST `/api/v1/user/auth` - Authenticate user
 
 
+## Frontend Repository
+The frontend code for this project can be found at:
+[Scrum Poker Frontend](https://github.com/MichaelNotych/scrumpoker)
+
 ## License
 This project is open-source under the MIT License.
