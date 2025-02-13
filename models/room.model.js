@@ -14,6 +14,10 @@ const roomSchema = mongoose.Schema({
 		enum: ['reveal', null],
 		default: null
 	},
+	owner: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+	},
 	median: {
 		type: Number,
 		default: null

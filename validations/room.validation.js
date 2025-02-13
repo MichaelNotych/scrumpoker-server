@@ -3,6 +3,7 @@ const joi = require("joi");
 const createRoomSchema = {
 	body: joi.object().keys({
 		name: joi.string().required(),
+		owner: joi.string().required(),
 	}),
 };
 

@@ -7,6 +7,7 @@ const { sseAuth, auth } = require("../middlewares/auth");
 
 router.post(
 	"/room",
+	auth,
 	validate(roomValidation.createRoomSchema),
 	roomController.createRoom
 );
@@ -28,8 +29,13 @@ router.post(
 	validate(roomValidation.resetRoomResults),
 	roomController.resetRoomResults
 );
-router.post("/room/leave", auth, validate(roomValidation.leaveRoom), roomController.leaveRoom);
-router.get("/room/:id", roomController.getRoomById);
+router.post(
+	"/room/leave",
+	auth,
+	validate(roomValidation.leaveRoom),
+	roomController.leaveRoom
+);
+router.get("/room/:id", auth, roomController.getRoomById);
 router.get("/room/enter/:id/:token", sseAuth, roomController.enterRoom);
 
 module.exports = router;

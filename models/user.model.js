@@ -4,10 +4,6 @@ const userSchema = mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
-	},
-	roomId: {
-		type: String,
-		required: true,
 	}
 }, { versionKey: false });
 

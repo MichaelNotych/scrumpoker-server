@@ -22,7 +22,6 @@ const auth = async (req, res, next) => {
 				new ApiError(status['UNAUTHORIZED'], "Invalid authorization credits")
 			);
 		req.userId = decoded.userId;
-		req.roomId = decoded.roomId;
 		resolve();
 	})
 		.then(() => next())

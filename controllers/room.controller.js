@@ -26,7 +26,9 @@ const getRoomById = catchAsync(async (req, res) => {
 
 const enterRoom = catchAsync(async (req, res) => {
 	// find the room
-	const room = await roomService.getRoomById(req.roomId);
+	const roomId = req.params.id;
+	const userId = req.userId;
+	const room = await roomService.getRoomById(roomId);
 
 	// send joinRoom event
 	// with room data
@@ -35,6 +37,7 @@ const enterRoom = catchAsync(async (req, res) => {
 		median: room.median,
 		average: room.average,
 		status: room.status,
+		owner: room.owner,
 	};
 
 	// update response type
@@ -48,11 +51,11 @@ const enterRoom = catchAsync(async (req, res) => {
 	res.write("\n");
 	res.write(`event: joinRoom\ndata: ${JSON.stringify(joinRoomData)}\n\n`);
 
-	roomService.enterRoom(req.roomId, req.userId, res);
+	roomService.enterRoom(roomId, userId, res);
 
 	// handle room leave
 	req.on("close", async () => {
-		roomService.proccessUserLeave(req.userId, req.roomId);
+		roomService.proccessUserLeave(userId, roomId);
 	});
 });
 
