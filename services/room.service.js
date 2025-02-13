@@ -30,6 +30,8 @@ const deleteRoomById = async (id) => {
  */
 const enterRoom = async (roomId, userId, res) => {
 	const user = await userService.getUserById(userId);
+	user.roomId = roomId;
+	await user.save();
 
 	if (!ACTIVE_ROOMS[roomId]) {
 		ACTIVE_ROOMS[roomId] = {};
@@ -108,8 +110,9 @@ const submitVote = async (value, roomId, userId) => {
 const revealRoomResults = async (roomId) => {
 	const room = await getRoomById(roomId);
 	const votes = await voteService.getAllRoomVotes(roomId);
-	const median = await voteService.getVotesMedian(votes);
-	const average = await voteService.getVotesAverage(votes);
+	const hasQuestionMark = votes.some(vote => vote.value === "?");
+	const median = hasQuestionMark ? '?' : voteService.getVotesMedian(votes).toString();
+	const average = hasQuestionMark ? '?' : voteService.getVotesAverage(votes).toString();
 
 	room.median = median;
 	room.average = average;
@@ -119,6 +122,7 @@ const revealRoomResults = async (roomId) => {
 	sendEvent("resultsReveal", roomId, {
 		median,
 		average,
+		status: room.status,
 	});
 };
 
@@ -197,18 +201,23 @@ const removeUserInActiveRoom = async (userId, roomId) => {
  * @param {string} roomId 
  */
 const removeUserDataInDB = async (userId, roomId) => {
-	// if time doesn't changed than 
-	// we can delete user and its vote
-	await userService.deleteById(userId);
-	await voteService.deleteUserVote(userId);
+	const room = await getRoomById(roomId);
+	const user = await userService.getUserById(userId);
+	const userIsRoomOwner = room.owner.equals(user._id);
 
 	const roomsCount = Object.keys(ACTIVE_ROOMS).length;
-	// if there is no users in room
-	// delete room and other users, if they exist
-	if (!Object.keys(ACTIVE_ROOMS[roomId]).length) {
+	// if there is no users in room or current user that left room is room owner
+	// delete room, room users and votes
+	if (!Object.keys(ACTIVE_ROOMS[roomId]).length || userIsRoomOwner) {
+		sendEvent("roomDeleted", roomId, {});
 		delete ACTIVE_ROOMS[roomId];
-		deleteRoomById(roomId);
-		userService.deleteUsersInRoom(roomId);
+		await deleteRoomById(roomId);
+		await userService.deleteUsersInRoom(roomId);
+		await voteService.deleteAllRoomVotes(roomId);
+	} else {
+		// only delete user and its vote
+		await userService.deleteById(userId);
+		await voteService.deleteUserVote(userId);
 	}
 
 	logger.info(`RM_USER_FROM_DB (userid: ${userId}) (rooms left: ${roomsCount} -> ${Object.keys(ACTIVE_ROOMS).length})`);

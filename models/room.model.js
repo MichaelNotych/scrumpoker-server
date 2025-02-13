@@ -19,11 +19,11 @@ const roomSchema = mongoose.Schema({
 		ref: 'User',
 	},
 	median: {
-		type: Number,
+		type: String,
 		default: null
 	},
 	average: {
-		type: Number,
+		type: String,
 		default: null
 	},
 }, { versionKey: false });

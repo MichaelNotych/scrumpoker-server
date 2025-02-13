@@ -40,7 +40,7 @@ const getAllRoomVotes = async (roomId) => {
 	});
 };
 
-const getVotesMedian = async (votes) => {
+const getVotesMedian = (votes) => {
 	const sortedVotes = votes.sort((a, b) => a.value - b.value);
 	let median;
 	if (sortedVotes.length % 2 === 1) {
@@ -57,7 +57,7 @@ const getVotesMedian = async (votes) => {
 	return median;
 };
 
-const getVotesAverage = async (votes) => {
+const getVotesAverage = (votes) => {
 	const votesSum = votes.reduce((acc, vote) => acc + parseInt(vote.value), 0);
 
 	return (votesSum / votes.length).toFixed(1) * 1;
